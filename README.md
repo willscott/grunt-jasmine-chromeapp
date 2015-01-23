@@ -60,3 +60,9 @@ Type: `Number`
 Default: `30000`
 
 How many milliseconds to wait for the browser to start up before failing.
+
+#### options.outfile
+Type: `String`
+Default: `.build`
+
+The directory to stage the chrome app into.

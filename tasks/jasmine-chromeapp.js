@@ -234,7 +234,6 @@ module.exports = function (grunt) {
       ctx = this.options({
         template: __dirname + '/../tasks/jasmine-chromeapp',
         version: '2.0.0',
-        templateId: '',
         outfile: '.build',
         helpers: undefined,
         keepRunner: false,
