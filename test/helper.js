@@ -1,1 +1,1 @@
-window.callback();
+window.callback(true);

@@ -47,8 +47,8 @@ module.exports = function (grunt) {
 
     // Copy user files.
     tags += addFiles(srcs, dest);
-    if (ctx.helper) {
-      addFiles(grunt.file.expand(ctx.helper), dest);
+    if (ctx.helpers) {
+      addFiles(grunt.file.expand(ctx.helpers), dest);
     }
     
     tags += "<script type='text/javascript' src='relay.js?port=" + ctx.port + "'></script>";
@@ -243,7 +243,7 @@ module.exports = function (grunt) {
       });
 
     if (grunt.option('debug')) {
-      grunt.log.debug(ctx);
+      grunt.log.debug(JSON.stringify(ctx));
     }
 
     ctx.src = this.filesSrc;

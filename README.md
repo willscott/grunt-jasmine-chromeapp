@@ -42,12 +42,7 @@ Use your own files in the app to customize your tests.
 #### src
 Type: `String|Array`
 
-Your source files. These are the files you are testing.
-
-#### options.specs
-Type: `String|Array`
-
-Your Jasmine specs.
+Your source files and specs. These are the files you are testing.
 
 #### options.helpers
 Type: `String|Array`
