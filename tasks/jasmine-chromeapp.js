@@ -16,8 +16,10 @@ module.exports = function (grunt) {
     var tags = '';
 
     files.forEach(function (file) {
-      tags += "<script type='text/javascript' src='scripts/" + file + "'></script>\n";
-      grunt.file.copy(file, to + '/scripts/' + file);
+      if (grunt.file.isFile(file)) {
+        tags += "<script type='text/javascript' src='scripts/" + file + "'></script>\n";
+        grunt.file.copy(file, to + '/scripts/' + file);
+      }
     });
 
     return tags;

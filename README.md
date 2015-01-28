@@ -47,7 +47,9 @@ Your source files and specs. These are the files you are testing.
 #### options.helpers
 Type: `String|Array`
 
-Additional non-source helper files which will be present, but not automatically included.
+Additional non-source helper files which will be copied into the running packaged app,
+but not automatically included as scripts.  They will be present in the `/scripts`
+directory.
 
 #### options.keepRunner
 Type: `Boolean`
