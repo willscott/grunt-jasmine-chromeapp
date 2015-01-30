@@ -3,14 +3,13 @@
 module.exports = function (grunt) {
   'use strict';
 
-  var selenium = require('selenium-standalone'),
-    http = require('http'),
+  var http = require('http'),
     chalk = require('chalk'),
-    driver = require('wd').promiseChainRemote(),
     path = require('path'),
     async = require('async'),
     fs = require('fs-extra'),
-    pkg = require('../package.json');
+    pkg = require('../package.json'),
+    chrome = require('../lib/launch-chrome');
 
   function addFiles(files, to, tagFilter) {
     var tags = '';
@@ -65,40 +64,10 @@ module.exports = function (grunt) {
     next();
   }
 
-  function installSelenium(ctx, next) {
-    grunt.log.write('Checking / Installing Selenium...');
-    
-    // Install if starting fails.
-    selenium.start(function (err, child) {
-      if (err) {
-        selenium.install(next);
-      } else {
-        child.kill();
-        next();
-      }
-    });
-  }
-
-  function startSelenium(ctx, next) {
-    grunt.log.writeln(chalk.green('Done.'));
+  function startReporter(ctx, next) {
     ctx.cleanupTimeout = setTimeout(cleanup.bind({}, ctx), ctx.timeout);
-    grunt.log.write('Starting Selenium...');
+    grunt.log.write('Starting Reporter...');
 
-    selenium.start({
-      spawnOptions: {
-        //stdio: 'pipe'
-      },
-      seleniumArgs: [
-        '-debug'
-      ]
-    }, function (err, child) {
-      if (err) {
-        grunt.fail.warn(err);
-      }
-      ctx.server = child;
-      grunt.log.writeln(chalk.green('Done.'));
-      next();
-    });
     ctx.messages = [];
     ctx.inprogress = '';
     ctx.web = http.createServer(function (req, res) {
@@ -128,20 +97,22 @@ module.exports = function (grunt) {
         }
       }
     }).listen(ctx.port);
+
+    grunt.log.writeln(chalk.green('Done.'));
+    next();
   }
 
-  function startDriver(ctx, next) {
-    grunt.log.write('Starting Browser...');
+  function startChrome(ctx, next) {
+    grunt.log.write('Starting Chrome...');
     ctx.onMessage = next;
-    ctx.driver = driver.init({
-      browserName: 'chrome',
-      chromeOptions: {
-        args: [
-          "--load-and-launch-app=" + ctx.outfile,
-          "--user-data-dir=" + ctx.outfile + '/profile'
-        ]
-      }
-    });
+    ctx.chrome = chrome([
+        "--no-first-run",
+        "--no-startup-window",
+        "--force-app-mode",
+        "--apps-keep-chrome-alive-in-tests",
+        "--load-and-launch-app=" + ctx.outfile,
+        "--user-data-dir=" + ctx.outfile + '/profile'
+    ]);
   }
   
   function testPoll(ctx, cb) {
@@ -216,20 +187,20 @@ module.exports = function (grunt) {
       good = false;
     }
     if (ctx.keepRunner) {
-      return next(good || new Error('One or more tests failed.'));
+      ctx.chrome.on('close', function () {
+        grunt.file['delete'](ctx.outfile);
+        ctx.web.close();
+        next(good || new Error('One or more tests failed.'));
+      });
+      return;
     }
 
     grunt.file['delete'](ctx.outfile);
-    ctx.driver.quit();
     ctx.web.close();
-    setTimeout(function () {
-      if (ctx.server) {
-        ctx.server.kill();
-      }
-    }, 500);
-    setTimeout(function () {
-      next(good || new Error('One or more tests failed.'));
-    }, 1000);
+    if (ctx.chrome) {
+      ctx.chrome.kill();
+    }
+    next(good || new Error('One or more tests failed.'));
   }
 
   grunt.registerMultiTask('jasmine_chromeapp', pkg.description, function () {
@@ -258,9 +229,8 @@ module.exports = function (grunt) {
 
     async.series([
       async.apply(buildSpec, ctx),
-      async.apply(installSelenium, ctx),
-      async.apply(startSelenium, ctx),
-      async.apply(startDriver, ctx),
+      async.apply(startReporter, ctx),
+      async.apply(startChrome, ctx),
       async.apply(runTests, ctx),
       async.apply(finishTests, ctx),
       async.apply(cleanup, ctx)
