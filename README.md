@@ -44,12 +44,12 @@ Type: `String|Array`
 
 Your source files and specs. These are the files you are testing.
 
-#### options.helpers
+#### options.paths
 Type: `String|Array`
 
-Additional non-source helper files which will be copied into the running packaged app,
-but not automatically included as scripts.  They will be present in the `/scripts`
-directory.
+Listing of which files should be included as script tags in the test runner. If not set, defaults
+to all files listed as source files, but can define a subset of those files to support copying
+non-js files, or other support files which should not be directly included.
 
 #### options.keepRunner
 Type: `Boolean`

@@ -15,9 +15,9 @@ module.exports = function (grunt) {
     },
     jasmine_chromeapp: {
       selftest: {
-        src: 'test/selftest.js',
+        src: 'test/*.js',
         options: {
-          helpers: 'test/helper.js'
+          paths: 'test/selftest.js'
         }
       }
     }

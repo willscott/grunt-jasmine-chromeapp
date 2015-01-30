@@ -12,12 +12,14 @@ module.exports = function (grunt) {
     fs = require('fs-extra'),
     pkg = require('../package.json');
 
-  function addFiles(files, to) {
+  function addFiles(files, to, tagFilter) {
     var tags = '';
 
     files.forEach(function (file) {
       if (grunt.file.isFile(file)) {
-        tags += "<script type='text/javascript' src='scripts/" + file + "'></script>\n";
+        if (grunt.file.match(tagFilter, file)) {
+          tags += "<script type='text/javascript' src='scripts/" + file + "'></script>\n";
+        }
         grunt.file.copy(file, to + '/scripts/' + file);
       }
     });
@@ -48,10 +50,10 @@ module.exports = function (grunt) {
     grunt.file.mkdir(ctx.outfile + '/profile');
 
     // Copy user files.
-    tags += addFiles(srcs, dest);
-    if (ctx.helpers) {
-      addFiles(grunt.file.expand(ctx.helpers), dest);
+    if (!ctx.paths) {
+      ctx.paths = srcs;
     }
+    tags += addFiles(srcs, dest, ctx.paths);
     
     tags += "<script type='text/javascript' src='relay.js?port=" + ctx.port + "'></script>";
 
