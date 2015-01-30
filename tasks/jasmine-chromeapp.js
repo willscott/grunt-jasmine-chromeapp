@@ -84,7 +84,8 @@ module.exports = function (grunt) {
         req.on('end', function () {
           ctx.messages.push(ctx.inprogress);
           ctx.inprogress = '';
-          res.end('Okay.');
+          res.setHeader('Access-Control-Allow-Origin', '*');
+          res.end(ctx.keepRunner? 'thanks!': 'kill');
           if (ctx.onMessage) {
             ctx.onMessage();
           }

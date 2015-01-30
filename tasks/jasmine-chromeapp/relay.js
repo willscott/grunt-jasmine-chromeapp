@@ -1,4 +1,4 @@
-/*globals jsApiReporter */
+/*globals jsApiReporter, chrome */
 var port = 9999,
   pollInterval;
 
@@ -10,6 +10,11 @@ function send() {
     payload = JSON.stringify(specs);
 
   req.open('post', 'http://localhost:' + port + '/put', true);
+  req.onload = function () {
+    if (this.responseText === 'kill') {
+      chrome.app.window.current().close();
+    }
+  };
   req.send(payload);
 }
 
