@@ -113,7 +113,7 @@ module.exports = function (grunt) {
         "--apps-keep-chrome-alive-in-tests",
         "--load-and-launch-app=" + ctx.outfile,
         "--user-data-dir=" + ctx.outfile + '/profile'
-    ]);
+    ], ctx.binary);
   }
   
   function testPoll(ctx, cb) {
@@ -211,7 +211,8 @@ module.exports = function (grunt) {
         template: __dirname + '/../tasks/jasmine-chromeapp',
         version: '2.0.0',
         outfile: '.build',
-        helpers: undefined,
+        paths: undefined,
+        binary: undefined,
         keepRunner: false,
         port: 9989,
         timeout : 30000

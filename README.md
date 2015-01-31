@@ -26,10 +26,10 @@ Jasmine Task
 Run this task with the ```grunt jasmine_chromeapp``` command.
 
 Automatically builds and maintains the spec runner and reports results back to the grunt console.
-Uses selenium with custom arguments to the chrome-driver to start an instance of chrome running
-the dynamically constructed chrome app package. The package reports results back to a web server
-run by the plugin, which then reports back to the console. This is because Selenium cannot actually
-control a running chrome packaged app, due to the web-driver implementation.
+Starts chrome with a dynamically created packaged application which runs jasmine specs. The package
+reports results back to a web server run by the plugin, which then reports back to the console.
+This structure is chosen becasue selenium is unable to debug or instrument packaged applications
+directly.
 
 Customize your SpecRunner
 -------------------------
@@ -56,6 +56,14 @@ Type: `Boolean`
 Default: `false`
 
 Prevents the auto-generated app from being automatically deleted, and leave the browser open.
+
+#### options.binary
+Type: `String`
+Default: `undefined`
+
+Specify the locations of `google-chrome` to run for testing. Defaults to the [per-platform
+default locations](https://code.google.com/p/selenium/wiki/ChromeDriver) specified by
+chromedriver if not specified.
 
 #### options.timeout
 Type: `Number`
