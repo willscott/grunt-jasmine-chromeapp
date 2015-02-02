@@ -17,10 +17,12 @@ module.exports = function (grunt) {
     files.forEach(function (file) {
       file.src.forEach(function (f) {
         var dest = file.dest || f;
-        if (grunt.file.isFile(f) && grunt.file.match(tagFilter, f)) {
-          tags += "<script type='text/javascript' src='scripts/" + dest + "'></script>\n";
+        if (grunt.file.isFile(f)) {
+          if (grunt.file.isMatch(tagFilter, f)) {
+            tags += "<script type='text/javascript' src='scripts/" + dest + "'></script>\n";
+          }
+          grunt.file.copy(f, to + '/scripts/' + dest);
         }
-        grunt.file.copy(f, to + '/scripts/' + dest);
       });
     });
 
