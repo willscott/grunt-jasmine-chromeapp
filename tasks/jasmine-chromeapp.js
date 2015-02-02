@@ -15,12 +15,13 @@ module.exports = function (grunt) {
     var tags = '';
 
     files.forEach(function (file) {
-      if (grunt.file.isFile(file)) {
-        if (grunt.file.match(tagFilter, file)) {
-          tags += "<script type='text/javascript' src='scripts/" + file + "'></script>\n";
+      file.src.forEach(function (f) {
+        var dest = file.dest || f;
+        if (grunt.file.isFile(f) && grunt.file.match(tagFilter, f)) {
+          tags += "<script type='text/javascript' src='scripts/" + dest + "'></script>\n";
         }
-        grunt.file.copy(file, to + '/scripts/' + file);
-      }
+        grunt.file.copy(f, to + '/scripts/' + dest);
+      });
     });
 
     return tags;
@@ -30,7 +31,6 @@ module.exports = function (grunt) {
     grunt.log.write('Building...');
     grunt.file.mkdir(ctx.outfile);
     var dest = ctx.outfile,
-      srcs = grunt.file.expand(ctx.src),
       tags = "";
 
     // Copy the template
@@ -50,9 +50,9 @@ module.exports = function (grunt) {
 
     // Copy user files.
     if (!ctx.paths) {
-      ctx.paths = srcs;
+      ctx.paths = ctx.files;
     }
-    tags += addFiles(srcs, dest, ctx.paths);
+    tags += addFiles(ctx.files, dest, ctx.paths);
     
     tags += "<script type='text/javascript' src='relay.js?port=" + ctx.port + "'></script>";
 
@@ -222,7 +222,7 @@ module.exports = function (grunt) {
       grunt.log.debug(JSON.stringify(ctx));
     }
 
-    ctx.src = this.filesSrc;
+    ctx.files = this.files;
     ctx.done = done;
     
     process.on('SIGINT', function () {
