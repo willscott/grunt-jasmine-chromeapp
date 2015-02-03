@@ -108,14 +108,18 @@ module.exports = function (grunt) {
   function startChrome(ctx, next) {
     grunt.log.write('Starting Chrome...');
     ctx.onMessage = next;
+
+    if (process.platform === "darwin") {
+      ctx.flags = ctx.flags.concat("--no-startup-window");
+    }
+    
     ctx.chrome = chrome([
         "--no-first-run",
-        "--no-startup-window",
         "--force-app-mode",
         "--apps-keep-chrome-alive-in-tests",
         "--load-and-launch-app=" + ctx.outfile,
         "--user-data-dir=" + ctx.outfile + '/profile'
-    ], ctx.binary);
+    ].concat(ctx.flags), ctx.binary);
   }
   
   function testPoll(ctx, cb) {
@@ -217,7 +221,8 @@ module.exports = function (grunt) {
         binary: undefined,
         keepRunner: false,
         port: 9989,
-        timeout : 30000
+        timeout : 30000,
+        flags: []
       });
 
     if (grunt.option('debug')) {
