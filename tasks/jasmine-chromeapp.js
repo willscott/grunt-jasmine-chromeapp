@@ -57,7 +57,7 @@ module.exports = function (grunt) {
 
     // Copy user files.
     if (!ctx.paths) {
-      ctx.paths = grunt.file.expand(ctx.files);
+      ctx.paths = grunt.file.expand(ctx.files[0].src);
     }
     tags += addFiles(ctx.files, dest, ctx.paths);
 
