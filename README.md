@@ -65,6 +65,15 @@ Specify the locations of `google-chrome` to run for testing. Defaults to the [pe
 default locations](https://code.google.com/p/selenium/wiki/ChromeDriver) specified by
 chromedriver if not specified.
 
+#### options.flags
+Type: `Array`
+Default: `[]`
+
+Additional command-line flags to pass to chrome. These are appended to the default flags
+used for instantiation: `--no-first-run`, `--force-app-mode`, `--apps-keep-chrome-alive-in-tests`,
+`--load-and-launch-app`, and `--user-data-dir`.
+`--no-startup-window` is also used for the Mac platform.
+
 #### options.timeout
 Type: `Number`
 Default: `30000`
