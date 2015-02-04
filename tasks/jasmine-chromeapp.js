@@ -17,7 +17,7 @@ module.exports = function (grunt) {
     files.forEach(function (file) {
       file.src.forEach(function (f) {
         var dest;
-        if (grunt.file.isDir(file.dest)) {
+        if (file.dest && grunt.file.isDir(file.dest)) {
           dest = f;
         } else {
           dest = file.dest || f;
@@ -57,7 +57,7 @@ module.exports = function (grunt) {
 
     // Copy user files.
     if (!ctx.paths) {
-      ctx.paths = ctx.files;
+      ctx.paths = grunt.file.expand(ctx.files);
     }
     tags += addFiles(ctx.files, dest, ctx.paths);
 
@@ -207,11 +207,16 @@ module.exports = function (grunt) {
       return;
     }
 
-    grunt.file['delete'](ctx.outfile);
     ctx.web.close();
     if (ctx.chrome) {
+      ctx.chrome.on('close', function () {
+        grunt.file['delete'](ctx.outfile);
+      });
       ctx.chrome.kill();
+    } else {
+      grunt.file['delete'](ctx.outfile);
     }
+
     next(good || new Error('One or more tests failed.'));
   }
 
