@@ -16,7 +16,12 @@ module.exports = function (grunt) {
 
     files.forEach(function (file) {
       file.src.forEach(function (f) {
-        var dest = file.dest || f;
+        var dest;
+        if (grunt.file.isDir(file.dest)) {
+          dest = f;
+        } else {
+          dest = file.dest || f;
+        }
         if (grunt.file.isFile(f)) {
           if (grunt.file.isMatch(tagFilter, f)) {
             tags += "<script type='text/javascript' src='scripts/" + dest + "'></script>\n";
@@ -55,7 +60,7 @@ module.exports = function (grunt) {
       ctx.paths = ctx.files;
     }
     tags += addFiles(ctx.files, dest, ctx.paths);
-    
+
     tags += "<script type='text/javascript' src='relay.js?port=" + ctx.port + "'></script>";
 
     // Update the template with found specs.
@@ -112,7 +117,7 @@ module.exports = function (grunt) {
     if (process.platform === "darwin") {
       ctx.flags = ctx.flags.concat("--no-startup-window");
     }
-    
+
     ctx.chrome = chrome([
         "--no-first-run",
         "--force-app-mode",
@@ -121,7 +126,7 @@ module.exports = function (grunt) {
         "--user-data-dir=" + ctx.outfile + '/profile'
     ].concat(ctx.flags), ctx.binary);
   }
-  
+
   function testPoll(ctx, cb) {
     if (ctx.messages.length > 0) {
       cb();
@@ -129,7 +134,7 @@ module.exports = function (grunt) {
       setTimeout(testPoll.bind({}, ctx, cb), 500);
     }
   }
-  
+
   function runTests(ctx, next) {
     grunt.log.write('Running Tests...');
     clearTimeout(ctx.cleanupTimeout);
@@ -138,7 +143,7 @@ module.exports = function (grunt) {
       next();
     };
   }
-  
+
   function finishTests(ctx, next) {
     grunt.log.write('Reporting on Tests...');
     testPoll(ctx, function (ctx) {
@@ -231,7 +236,7 @@ module.exports = function (grunt) {
 
     ctx.files = this.files;
     ctx.done = done;
-    
+
     process.on('SIGINT', function () {
       cleanup(ctx);
     });
