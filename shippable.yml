@@ -1,0 +1,18 @@
+language: node_js
+
+node_js:
+  - "0.10"
+
+before_install:
+  - apt-get install -y libxss1 libappindicator1 libindicator7
+  - wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+  - dpkg -i google-chrome*.deb
+  - wget https://googledrive.com/host/0B5VlNZ_Rvdw6NTJoZDBSVy1ZdkE -O /opt/google/chrome/chrome-sandbox
+  - chmod 4775 /opt/google/chrome/chrome-sandbox
+
+before_script:
+  - "export DISPLAY=:99.0"
+  - "/etc/init.d/xvfb start"
+
+script:
+  - grunt
