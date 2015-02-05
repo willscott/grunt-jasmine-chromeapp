@@ -1,6 +1,6 @@
 {
   "name": "grunt-jasmine-chromeapp",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Grunt task to run jasmine tests in a chrome packaged app",
   "scripts": {
     "test": "grunt test"
