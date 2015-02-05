@@ -16,4 +16,4 @@ before_script:
   - "/etc/init.d/xvfb start"
 
 script:
-  - grunt
+  - grunt test --verbose --debug
