@@ -11,6 +11,9 @@ before_install:
   - sudo chown root:root /opt/google/chrome/chrome-sandbox
   - sudo chmod 4775 /opt/google/chrome/chrome-sandbox
 
+install:
+  - shippable_retry npm install -g grunt-cli
+
 before_script:
   - "export DISPLAY=:99.0"
   - "/etc/init.d/xvfb start"
