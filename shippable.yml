@@ -13,6 +13,7 @@ before_install:
 
 install:
   - shippable_retry npm install -g grunt-cli
+  - shippable_retry npm install
 
 before_script:
   - "export DISPLAY=:99.0"
@@ -20,3 +21,6 @@ before_script:
 
 script:
   - grunt test --verbose --debug
+
+notifications:
+  email: false

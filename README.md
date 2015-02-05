@@ -2,6 +2,7 @@
 
 > Run jasmine specs in a Chrome Packaged App
 
+[![Build Status](https://api.shippable.com/projects/54d3c81a5ab6cc13528afac2/badge?branchName=master)](https://app.shippable.com/projects/54d3c81a5ab6cc13528afac2/builds/latest)
 
 Getting Started
 ---------------
