@@ -1,8 +1,9 @@
-/*globals describe, it, expect*/
+/*globals describe, it, expect, console*/
 
 describe('jasmine-chromeapp', function () {
   'use strict';
   it('Runs & Reports', function () {
+    console.warn('A log Message');
     expect(true).toBe(true);
   });
 

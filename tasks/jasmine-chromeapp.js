@@ -66,6 +66,11 @@ module.exports = function (grunt) {
 
     tags += "<script type='text/javascript' src='relay.js?port=" + ctx.port + "'></script>";
 
+    if (!ctx.keepRunner && grunt.option('verbose')) {
+      grunt.verbose.writeln('Asking to capture chrome logs.');
+      tags += "<script type='text/javascript' src='log.js'></script>";
+    }
+
     // Update the template with found specs.
     tags = grunt.file.read(dest + '/main.html') + tags;
     grunt.file.write(dest + '/main.html', tags);
@@ -153,7 +158,8 @@ module.exports = function (grunt) {
       grunt.log.writeln(chalk.green('Done.'));
       var parse = JSON.parse(ctx.messages[0]),
         spec,
-        i = 0;
+        i = 0,
+        logs = parse.pop();
 
       ctx.status = {failed: 0};
       for (i = 0; i < parse.length; i += 1) {
@@ -179,6 +185,18 @@ module.exports = function (grunt) {
             grunt.log.writeln('*' + spec.fullName);
           }
         }
+      }
+      if (logs) {
+        grunt.verbose.writeln(chalk.bold('Log Messages'));
+        logs.forEach(function (log) {
+          if (log[1] === 'error') {
+            grunt.verbose.writeln(log[0] + '\t' + chalk.red(log[2]));
+          } else if (log[1] === 'warn') {
+            grunt.verbose.writeln(log[0] + '\t' + chalk.yellow(log[2]));
+          } else {
+            grunt.verbose.writeln(log[0] + '\t' + log[2]);
+          }
+        });
       }
       next();
     }.bind({}, ctx));

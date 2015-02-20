@@ -1,13 +1,19 @@
 /*globals jsApiReporter, chrome */
 var port = 9999,
-  pollInterval;
+  pollInterval,
+  logs;
 
 // This code sends the report.
 function send() {
   'use strict';
   var req = new XMLHttpRequest(),
     specs = jsApiReporter.specs(),
-    payload = JSON.stringify(specs);
+    payload;
+
+  if (specs.length) {
+    specs.push(logs);
+  }
+  payload = JSON.stringify(specs);
 
   req.open('post', 'http://localhost:' + port + '/put', true);
   req.onload = function () {
