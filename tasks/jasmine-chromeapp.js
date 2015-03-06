@@ -9,7 +9,7 @@ module.exports = function (grunt) {
     async = require('async'),
     fs = require('fs-extra'),
     pkg = require('../package.json'),
-    chrome = require('../lib/launch-chrome');
+    chrome = require('node-chrome-runner');
 
   function addFiles(files, to, tagFilter) {
     var tags = '';
@@ -126,13 +126,13 @@ module.exports = function (grunt) {
       ctx.flags = ctx.flags.concat("--no-startup-window");
     }
 
-    ctx.chrome = chrome([
+    ctx.chrome = chrome.runChrome({args: [
         "--no-first-run",
         "--force-app-mode",
         "--apps-keep-chrome-alive-in-tests",
         "--load-and-launch-app=" + ctx.outfile,
         "--user-data-dir=" + ctx.outfile + '/profile'
-    ].concat(ctx.flags), ctx.binary);
+    ].concat(ctx.flags), path: ctx.binary});
   }
 
   function testPoll(ctx, cb) {
@@ -220,7 +220,7 @@ module.exports = function (grunt) {
       good = false;
     }
     if (ctx.keepRunner) {
-      ctx.chrome.on('close', function () {
+      ctx.chrome.childProcess.on('close', function () {
         grunt.file['delete'](ctx.outfile);
         ctx.web.close();
         next(good || new Error('One or more tests failed.'));
@@ -230,10 +230,10 @@ module.exports = function (grunt) {
 
     ctx.web.close();
     if (ctx.chrome) {
-      ctx.chrome.on('close', function () {
+      ctx.chrome.childProcess.on('close', function () {
         grunt.file['delete'](ctx.outfile);
       });
-      ctx.chrome.kill();
+      ctx.chrome.childProcess.kill();
     } else {
       grunt.file['delete'](ctx.outfile);
     }
