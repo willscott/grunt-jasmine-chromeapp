@@ -79,6 +79,45 @@ module.exports = function (grunt) {
     next();
   }
 
+  function cleanup(ctx, next) {
+    var good = true;
+    if (ctx.cleanupTimeout) {
+      clearTimeout(ctx.cleanupTimeout);
+    }
+    if (!next) {
+      next = ctx.done;
+    }
+    if (!ctx.status) {
+      grunt.log.error(chalk.red('Timed out'));
+      good = false;
+    } else if (ctx.status.failed === 0) {
+      grunt.log.ok(chalk.green('0 failures'));
+    } else {
+      grunt.log.error(chalk.red(ctx.status.failed + ' failures'));
+      good = false;
+    }
+    if (ctx.keepRunner) {
+      ctx.chrome.childProcess.on('close', function () {
+        grunt.file['delete'](ctx.outfile);
+        ctx.web.close();
+        next(good || new Error('One or more tests failed.'));
+      });
+      return;
+    }
+
+    ctx.web.close();
+    if (ctx.chrome) {
+      ctx.chrome.childProcess.on('close', function () {
+        grunt.file['delete'](ctx.outfile);
+      });
+      ctx.chrome.childProcess.kill();
+    } else {
+      grunt.file['delete'](ctx.outfile);
+    }
+
+    next(good || new Error('One or more tests failed.'));
+  }
+
   function startReporter(ctx, next) {
     ctx.cleanupTimeout = setTimeout(cleanup.bind({}, ctx), ctx.timeout);
     grunt.log.write('Starting Reporter...');
@@ -200,45 +239,6 @@ module.exports = function (grunt) {
       }
       next();
     }.bind({}, ctx));
-  }
-
-  function cleanup(ctx, next) {
-    var good = true;
-    if (ctx.cleanupTimeout) {
-      clearTimeout(ctx.cleanupTimeout);
-    }
-    if (!next) {
-      next = ctx.done;
-    }
-    if (!ctx.status) {
-      grunt.log.error(chalk.red('Timed out'));
-      good = false;
-    } else if (ctx.status.failed === 0) {
-      grunt.log.ok(chalk.green('0 failures'));
-    } else {
-      grunt.log.error(chalk.red(ctx.status.failed + ' failures'));
-      good = false;
-    }
-    if (ctx.keepRunner) {
-      ctx.chrome.childProcess.on('close', function () {
-        grunt.file['delete'](ctx.outfile);
-        ctx.web.close();
-        next(good || new Error('One or more tests failed.'));
-      });
-      return;
-    }
-
-    ctx.web.close();
-    if (ctx.chrome) {
-      ctx.chrome.childProcess.on('close', function () {
-        grunt.file['delete'](ctx.outfile);
-      });
-      ctx.chrome.childProcess.kill();
-    } else {
-      grunt.file['delete'](ctx.outfile);
-    }
-
-    next(good || new Error('One or more tests failed.'));
   }
 
   grunt.registerMultiTask('jasmine_chromeapp', pkg.description, function () {
